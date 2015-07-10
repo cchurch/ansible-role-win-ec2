@@ -1,0 +1,13 @@
+---
+
+win_ec2_region: 'us-east-1'
+win_ec2_instance_type: 'm3.medium'
+win_ec2_security_group: 'win-ec2'
+win_ec2_security_group_description: 'Security group for Ansible WinRM'
+win_ec2_key_name: 'win-ec2'
+win_ec2_public_key_path: '~/.ssh/id_rsa.pub'
+win_ec2_private_key_path: '~/.ssh/id_rsa'
+win_ec2_name_prefix: 'win-ec2'
+win_ec2_images: '{{win_ec2_default_images[win_ec2_region]}}'
+win_ec2_action: create
+win_ec2_inventory_dest: '{{playbook_dir}}/inventory.win-ec2'

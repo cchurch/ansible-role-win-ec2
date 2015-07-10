@@ -1,0 +1,107 @@
+---
+
+- name: search for win ec2 amis
+  action:
+    module: ec2_ami_find
+    aws_access_key: '{{aws_access_key|default(omit)}}'
+    aws_secret_key: '{{aws_secret_key|default(omit)}}'
+    region: '{{win_ec2_region|mandatory}}'
+    platform: windows
+    owner: amazon
+    architecture: x86_64
+    name: "*English-64Bit-Base*"
+  register: win_ec2_amis
+  when: false
+
+- name: delete existing win ec2 instance(s)
+  ec2:
+    aws_access_key: '{{aws_access_key|default(omit)}}'
+    aws_secret_key: '{{aws_secret_key|default(omit)}}'
+    region: '{{win_ec2_region|mandatory}}'
+    instance_type: '{{win_ec2_instance_type|mandatory}}'
+    image: '{{item.ami_id|mandatory}}'
+    count_tag:
+      Name: '{{win_ec2_name_prefix|mandatory}}-{{item.name|mandatory}}'
+    exact_count: 0
+    wait: yes
+  with_items: win_ec2_images
+  when: 'win_ec2_action in ("recreate", "destroy")'
+
+- name: create security group for win ec2 instance(s)
+  ec2_group:
+    aws_access_key: '{{aws_access_key|default(omit)}}'
+    aws_secret_key: '{{aws_secret_key|default(omit)}}'
+    region: '{{win_ec2_region|mandatory}}'
+    name: '{{win_ec2_security_group|mandatory}}'
+    description: '{{win_ec2_security_group_description|default("")}}'
+    state: present
+    rules: "{{win_ec2_security_group_rules|list}}"
+  when: 'win_ec2_images and "create" in win_ec2_action'
+
+- name: create keypair for win ec2 instance(s)
+  ec2_key:
+    aws_access_key: '{{aws_access_key|default(omit)}}'
+    aws_secret_key: '{{aws_secret_key|default(omit)}}'
+    region: '{{win_ec2_region|mandatory}}'
+    name: '{{win_ec2_key_name|mandatory}}'
+    key_material: '{{item}}'
+  with_file: win_ec2_public_key_path
+  when: 'win_ec2_images and "create" in win_ec2_action'
+
+- name: create win ec2 instance(s)
+  ec2:
+    aws_access_key: '{{aws_access_key|default(omit)}}'
+    aws_secret_key: '{{aws_secret_key|default(omit)}}'
+    region: '{{win_ec2_region|mandatory}}'
+    instance_type: '{{ win_ec2_instance_type }}'
+    image: '{{item.ami_id|mandatory}}'
+    instance_tags:
+      Name: '{{win_ec2_name_prefix|mandatory}}-{{item.name|mandatory}}'
+    group: '{{win_ec2_security_group|mandatory}}'
+    key_name: '{{win_ec2_key_name|mandatory}}'
+    user_data: '{{lookup("file", "win_ec2_user_data")}}'
+    count_tag:
+      Name: '{{win_ec2_name_prefix|mandatory}}-{{item.name|mandatory}}'
+    exact_count: 1
+    wait: yes
+  with_items: win_ec2_images
+  when: 'win_ec2_images and "create" in win_ec2_action'
+  register: win_ec2_instances
+
+- name: wait for win ec2 instances to listen on winrm https port
+  wait_for:
+    state: started
+    host: '{{item.tagged_instances[0].public_ip}}'
+    port: '{{win_ec2_winrm_port}}'
+  with_items: win_ec2_instances.results
+  when: 'win_ec2_images and "create" in win_ec2_action and win_ec2_instances is defined'
+
+- name: obtain initial passwords for win ec2 instance(s)
+  win_ec2_password:
+    aws_access_key: '{{aws_access_key|default(omit)}}'
+    aws_secret_key: '{{aws_secret_key|default(omit)}}'
+    region: '{{win_ec2_region|mandatory}}'
+    instance_id: '{{item.tagged_instances[0].id}}'
+    key_file: '{{win_ec2_private_key_path}}'
+  with_items: win_ec2_instances.results
+  register: win_ec2_passwords
+  when: 'win_ec2_images and "create" in win_ec2_action and win_ec2_instances is defined'
+
+- name: add win ec2 instance(s) to inventory
+  add_host:
+    name: '{{item.item.tagged_instances[0].public_dns_name}}'
+    groups: 'ec2,windows,{{win_ec2_name_prefix}}-{{item.item.item.name}}'
+    ansible_ssh_host: '{{item.item.tagged_instances[0].public_ip}}'
+    ansible_ssh_port: '{{win_ec2_winrm_port}}'
+    ansible_ssh_user: '{{win_ec2_winrm_user}}'
+    ansible_ssh_pass: '{{item.win_password}}'
+    ansible_connection: 'winrm'
+  with_items: win_ec2_passwords.results
+  when: 'win_ec2_images and "create" in win_ec2_action and win_ec2_passwords is defined'
+
+- name: generate static inventory file for win ec2 instance(s)
+  template:
+    src: win_inventory.j2
+    dest: '{{win_ec2_inventory_dest}}'
+    mode: '0644'
+  when: 'win_ec2_images and "create" in win_ec2_action and win_ec2_passwords is defined and win_ec2_inventory_dest'

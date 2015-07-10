@@ -1,0 +1,59 @@
+---
+
+# Available windows ec2 images.
+# https://console.aws.amazon.com/ec2/v2/home?region=us-east-1#Images:visibility=public-images;ownerAlias=amazon;platform=windows;architecture=x86_64;name=english;search=base;sort=desc:name
+win_ec2_default_images:
+  'us-east-1':
+    - name: server-2008
+      ami_id: ami-8114e1ea
+    - name: server-2008-r2
+      ami_id: ami-5fe81d34
+    - name: server-2012
+      ami_id: ami-478d782c
+    - name: server-2012-r2
+      ami_id: ami-5b9e6b30
+
+win_ec2_winrm_port: 5986
+win_ec2_winrm_user: Administrator
+
+win_ec2_security_group_rules:
+  - proto: tcp
+    from_port: 22
+    to_port: 22
+    cidr_ip: 0.0.0.0/0
+  - proto: tcp
+    from_port: 80
+    to_port: 80
+    cidr_ip: 0.0.0.0/0
+  - proto: tcp
+    from_port: 88
+    to_port: 88
+    cidr_ip: 0.0.0.0/0
+  - proto: udp
+    from_port: 88
+    to_port: 88
+    cidr_ip: 0.0.0.0/0
+  - proto: tcp
+    from_port: 389
+    to_port: 389
+    cidr_ip: 0.0.0.0/0
+  - proto: tcp
+    from_port: 443
+    to_port: 443
+    cidr_ip: 0.0.0.0/0
+  - proto: tcp
+    from_port: 636
+    to_port: 636
+    cidr_ip: 0.0.0.0/0
+  - proto: tcp
+    from_port: 3389
+    to_port: 3389
+    cidr_ip: 0.0.0.0/0
+  - proto: tcp
+    from_port: 5985
+    to_port: 5985
+    cidr_ip: 0.0.0.0/0
+  - proto: tcp
+    from_port: 5986
+    to_port: 5986
+    cidr_ip: 0.0.0.0/0

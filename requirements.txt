@@ -1,0 +1,4 @@
+ansible==1.9.2
+boto==2.38.0
+bumpversion==0.5.3
+pywinrm==0.0.3

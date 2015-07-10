@@ -1,0 +1,51 @@
+---
+
+- name: prepare test environment
+  hosts: local
+  tasks:
+    - set_fact:
+        win_ec2_inventory_dest: '{{playbook_dir}}/inventory.win-ec2'
+        win_ec2_key_name: 'test-win-ec2'
+        win_ec2_name_prefix: 'test-win-ec2'
+        win_ec2_security_group: 'test-win-ec2'
+    - name: remove generated windows inventory file
+      file:
+        path: "{{win_ec2_inventory_dest}}"
+        state: absent
+
+- name: create windows instances in ec2
+  hosts: local
+  gather_facts: false
+  roles:
+    - role: cchurch.win-ec2
+  post_tasks:
+    - name: get stats for generated windows inventory file
+      stat:
+        path: "{{win_ec2_inventory_dest}}"
+      register: win_ec2_inventory_result
+    - name: verify that inventory file was generated
+      assert:
+        that:
+          - win_ec2_inventory_result.stat.exists
+
+- name: ping new windows instances added with add_host
+  hosts: windows
+  gather_facts: false
+  tasks:
+    - name: ping windows instance
+      action: win_ping
+
+- name: ping new windows instances using inventory file
+  hosts: local
+  gather_facts: false
+  tasks:
+    - name: run ansible with generated inventory file
+      command: >
+        ansible -i {{win_ec2_inventory_dest|quote}} -m win_ping windows
+
+- name: destroy windows instances in ec2
+  hosts: local
+  gather_facts: false
+  roles:
+    - role: cchurch.win-ec2
+      win_ec2_action: destroy
