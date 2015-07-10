@@ -57,6 +57,7 @@
   roles:
     - role: cchurch.win-ec2
       win_ec2_action: destroy
+      tags: cleanup
   post_tasks:
     - name: remove test security group for win ec2
       ec2_group:
@@ -66,6 +67,7 @@
         name: '{{win_ec2_security_group}}'
         description: ''
         state: absent
+      tags: cleanup
     - name: remove test keypair for win ec2
       ec2_key:
         aws_access_key: '{{aws_access_key|default(omit)}}'
@@ -73,3 +75,4 @@
         region: '{{win_ec2_region}}'
         name: '{{win_ec2_key_name}}'
         state: absent
+      tags: cleanup

@@ -2,8 +2,11 @@ language: python
 python: '2.7'
 install:
 - pip install -r requirements.txt
+- pip install ssl-opt-out
 script:
-- ansible-playbook -i test/local -vv test/main.yml
+- ansible-playbook -i test/local -v test/main.yml
+after_failure:
+- ansible-playbook -i test/local -t cleanup -v test/main.yml
 env:
   global:
   - secure: BfZ1kLBNTeFFNe3dDaFADt4VIxiGnBXYNqQiy0+j28Qx1uczvSCsnAPWfRz77fXykmDCXOOrycdq5pDjH3nTJFNtPbN30P10f2YzBJjgtQSXiWjbdyKG3xHvYEg/9LRsXcZEikX9CiTozG6Dpb0sYSgqw4cuiOG+R4WyyJthZmwOoMPRpObMXdmXwDvgzyMMo0HQZQ4OmXgYB2OFDTgX1eFgkZl3hWqwbF1XXmQHEPuqVYPTU2nyqwpC2kUuOKHfPdvTrmo+OyfKQ+P4fDwoDpJ3SDQZve6fam0rfiNP3w694Oh9BEs42t1c/DuA/7jTJ55YMivXBIBAiyVU6wH6D7xOUpbtUIFZ/iZ7/vLkEWGKPBkLi4IfK9+B+myoIXL4+C4kMAig+uNLLyDUQXjKabCdRdCfzjjRk/dVHk3/OgbvDuojQN7XvPvRSPm1uinl2XmLau5cDQnrkJp0lsFRq+fFIhfJX1piCI9GWYs1Aa35l0EgZflCrI1JDk9awK0IpcNw/zIxSSAvTm3pTIAKY8DIuOS1zLGgC7xTc9znlb0w3XIULp69MbeliOx1lUdE78jUoCOHzI3am11O75LeHvWECX2ieHNRr3qRvfAdyP7KUFVFKPiKniIPGLZl1AXh+UqdLeYmRAg+iz6vDgmjFKkbgVfwA8L/aBDZGLus9GQ=
