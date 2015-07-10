@@ -2,13 +2,15 @@
 
 - name: prepare test environment
   hosts: local
+  vars:
+    win_ec2_test_name: 'test-win-ec2'
   tasks:
     - set_fact:
         win_ec2_region: 'us-east-1'
         win_ec2_inventory_dest: '{{playbook_dir}}/inventory.win-ec2'
-        win_ec2_key_name: 'test-win-ec2'
-        win_ec2_name_prefix: 'test-win-ec2'
-        win_ec2_security_group: 'test-win-ec2'
+        win_ec2_key_name: '{{win_ec2_test_name}}'
+        win_ec2_name_prefix: '{{win_ec2_test_name}}'
+        win_ec2_security_group: '{{win_ec2_test_name}}'
         win_ec2_public_key_path: '{{playbook_dir}}/test_id_rsa.pub'
         win_ec2_private_key_path: '{{playbook_dir}}/test_id_rsa'
     - name: remove generated windows inventory file
