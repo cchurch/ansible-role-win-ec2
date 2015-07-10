@@ -1,4 +1,4 @@
 tmp
 test/tmp
 test/inventory.win-ec2
-
+test/test_id_rsa*
