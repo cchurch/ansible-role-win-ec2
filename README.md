@@ -1,5 +1,5 @@
 [![Build Status](http://img.shields.io/travis/cchurch/ansible-role-win-ec2.svg)](https://travis-ci.org/cchurch/ansible-role-win-ec2)
-[![Galaxy](http://img.shields.io/badge/galaxy-cchurch.win--ec2-blue.svg)](https://galaxy.ansible.com/list#/roles/4344)
+[![Galaxy](http://img.shields.io/badge/galaxy-cchurch.win--ec2-blue.svg)](https://galaxy.ansible.com/cchurch/win-ec2/)
 
 Win-EC2
 =======
