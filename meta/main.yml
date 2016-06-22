@@ -5,7 +5,7 @@ galaxy_info:
   description: Create and destroy Windows instances on EC2.
   company: "Nine More Minutes, Inc."
   license: BSD
-  min_ansible_version: 1.8
+  min_ansible_version: 2.0
   platforms:
     - name: EL
       versions: ['all']

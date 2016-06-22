@@ -24,7 +24,7 @@
       Name: '{{win_ec2_name_prefix|mandatory}}-{{item.name|mandatory}}'
     exact_count: 0
     wait: yes
-  with_items: win_ec2_images
+  with_items: '{{win_ec2_images}}'
   when: 'win_ec2_action in ("recreate", "destroy")'
 
 - name: create security group for win ec2 instance(s)
@@ -45,7 +45,7 @@
     region: '{{win_ec2_region|mandatory}}'
     name: '{{win_ec2_key_name|mandatory}}'
     key_material: '{{item}}'
-  with_file: win_ec2_public_key_path
+  with_file: '{{win_ec2_public_key_path}}'
   when: 'win_ec2_images and "create" in win_ec2_action'
 
 - name: create win ec2 instance(s)
@@ -64,7 +64,7 @@
       Name: '{{win_ec2_name_prefix|mandatory}}-{{item.name|mandatory}}'
     exact_count: 1
     wait: yes
-  with_items: win_ec2_images
+  with_items: '{{win_ec2_images}}'
   when: 'win_ec2_images and "create" in win_ec2_action'
   register: win_ec2_instances
 
@@ -73,17 +73,18 @@
     state: started
     host: '{{item.tagged_instances[0].public_ip}}'
     port: '{{win_ec2_winrm_port}}'
-  with_items: win_ec2_instances.results
+  with_items: '{{win_ec2_instances.results}}'
   when: 'win_ec2_images and "create" in win_ec2_action and win_ec2_instances is defined'
 
 - name: obtain initial passwords for win ec2 instance(s)
-  win_ec2_password:
+  ec2_win_password:
     aws_access_key: '{{aws_access_key|default(omit)}}'
     aws_secret_key: '{{aws_secret_key|default(omit)}}'
     region: '{{win_ec2_region|mandatory}}'
     instance_id: '{{item.tagged_instances[0].id}}'
     key_file: '{{win_ec2_private_key_path}}'
-  with_items: win_ec2_instances.results
+    wait: yes
+  with_items: '{{win_ec2_instances.results}}'
   register: win_ec2_passwords
   when: 'win_ec2_images and "create" in win_ec2_action and win_ec2_instances is defined'
 
@@ -91,12 +92,13 @@
   add_host:
     name: '{{item.item.tagged_instances[0].public_dns_name}}'
     groups: 'ec2,windows,{{win_ec2_name_prefix}}-{{item.item.item.name}}'
-    ansible_ssh_host: '{{item.item.tagged_instances[0].public_ip}}'
-    ansible_ssh_port: '{{win_ec2_winrm_port}}'
-    ansible_ssh_user: '{{win_ec2_winrm_user}}'
-    ansible_ssh_pass: '{{item.win_password}}'
+    ansible_host: '{{item.item.tagged_instances[0].public_ip}}'
+    ansible_port: '{{win_ec2_winrm_port}}'
+    ansible_user: '{{win_ec2_winrm_user}}'
+    ansible_password: '{{item.win_password}}'
+    ansible_winrm_server_cert_validation: ignore
     ansible_connection: 'winrm'
-  with_items: win_ec2_passwords.results
+  with_items: '{{win_ec2_passwords.results}}'
   when: 'win_ec2_images and "create" in win_ec2_action and win_ec2_passwords is defined'
 
 - name: generate static inventory file for win ec2 instance(s)
