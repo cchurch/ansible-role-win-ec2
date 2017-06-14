@@ -11,3 +11,7 @@ win_ec2_name_prefix: 'win-ec2'
 win_ec2_images: '{{win_ec2_default_images[win_ec2_region]}}'
 win_ec2_action: create
 win_ec2_inventory_dest: '{{playbook_dir}}/inventory.win-ec2'
+win_ec2_wait_for: true
+win_ec2_wait_for_delay: 5
+win_ec2_wait_for_timeout: 300
+win_ec2_password_wait_timeout: 300

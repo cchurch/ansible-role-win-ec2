@@ -32,11 +32,13 @@
     aws_access_key: '{{aws_access_key|default(omit)}}'
     aws_secret_key: '{{aws_secret_key|default(omit)}}'
     region: '{{win_ec2_region|mandatory}}'
-    name: '{{win_ec2_security_group|mandatory}}'
+    name: '{{win_ec2_security_group}}'
     description: '{{win_ec2_security_group_description|default("")}}'
+    vpc_id: '{{win_ec2_vpc_id|default(omit)}}'
     state: present
     rules: "{{win_ec2_security_group_rules|list}}"
-  when: 'win_ec2_images and "create" in win_ec2_action'
+  when: 'win_ec2_security_group|default("",true) and win_ec2_images and "create" in win_ec2_action'
+  register: win_ec2_security_group_result
 
 - name: create keypair for win ec2 instance(s)
   ec2_key:
@@ -57,9 +59,12 @@
     image: '{{item.ami_id|mandatory}}'
     instance_tags:
       Name: '{{win_ec2_name_prefix|mandatory}}-{{item.name|mandatory}}'
-    group: '{{win_ec2_security_group|mandatory}}'
+    group_id: '{{win_ec2_security_group_id|default(win_ec2_security_group_result.group_id)|mandatory}}'
     key_name: '{{win_ec2_key_name|mandatory}}'
     user_data: '{{lookup("file", "win_ec2_user_data")}}'
+    vpc_subnet_id: '{{win_ec2_vpc_subnet_id|default(omit)}}'
+    assign_public_ip: '{{win_ec2_assign_public_ip|default(omit)}}'
+    termination_protection: '{{win_ec2_termination_protection|default(omit)}}'
     count_tag:
       Name: '{{win_ec2_name_prefix|mandatory}}-{{item.name|mandatory}}'
     exact_count: 1
@@ -73,8 +78,10 @@
     state: started
     host: '{{item.tagged_instances[0].public_ip}}'
     port: '{{win_ec2_winrm_port}}'
+    delay: '{{win_ec2_wait_for_delay|default(omit)}}'
+    timeout: '{{win_ec2_wait_for_timeout|default(omit)}}'
   with_items: '{{win_ec2_instances.results}}'
-  when: 'win_ec2_images and "create" in win_ec2_action and win_ec2_instances is defined'
+  when: 'win_ec2_images and "create" in win_ec2_action and win_ec2_instances is defined and win_ec2_wait_for'
 
 - name: obtain initial passwords for win ec2 instance(s)
   ec2_win_password:
@@ -84,15 +91,16 @@
     instance_id: '{{item.tagged_instances[0].id}}'
     key_file: '{{win_ec2_private_key_path}}'
     wait: yes
+    wait_timeout: '{{win_ec2_password_wait_timeout|default(omit)}}'
   with_items: '{{win_ec2_instances.results}}'
   register: win_ec2_passwords
   when: 'win_ec2_images and "create" in win_ec2_action and win_ec2_instances is defined'
 
 - name: add win ec2 instance(s) to inventory
   add_host:
-    name: '{{item.item.tagged_instances[0].public_dns_name}}'
+    name: '{{item.item.tagged_instances[0].public_dns_name|default(item.item.tagged_instances[0].private_dns_name,true)}}'
     groups: 'ec2,windows,{{win_ec2_name_prefix}}-{{item.item.item.name}}'
-    ansible_host: '{{item.item.tagged_instances[0].public_ip}}'
+    ansible_host: '{{item.item.tagged_instances[0].public_ip|default(item.item.tagged_instances[0].private_ip,true)}}'
     ansible_port: '{{win_ec2_winrm_port}}'
     ansible_user: '{{win_ec2_winrm_user}}'
     ansible_password: '{{item.win_password}}'

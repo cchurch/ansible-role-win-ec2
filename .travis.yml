@@ -9,6 +9,8 @@ env:
   matrix:
     - ANSIBLE_VERSION_SPEC="ansible>=2.0,<2.1"
     - ANSIBLE_VERSION_SPEC="ansible>=2.1,<2.2"
+    - ANSIBLE_VERSION_SPEC="ansible>=2.2,<2.3"
+    - ANSIBLE_VERSION_SPEC="ansible>=2.3,<2.4"
 
 install:
   - pip install $ANSIBLE_VERSION_SPEC boto pywinrm

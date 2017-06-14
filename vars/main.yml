@@ -5,13 +5,15 @@
 win_ec2_default_images:
   'us-east-1':
     - name: server-2008
-      ami_id: ami-79db1c14
+      ami_id: ami-4842345e
     - name: server-2008-r2
-      ami_id: ami-a2d017cf
+      ami_id: ami-b36b1da5
     - name: server-2012
-      ami_id: ami-0ee42363
+      ami_id: ami-62057374
     - name: server-2012-r2
-      ami_id: ami-79dc1b14
+      ami_id: ami-271b6d31
+    - name: server-2016
+      ami_id: ami-c61163d0
 
 win_ec2_winrm_port: 5986
 win_ec2_winrm_user: Administrator
