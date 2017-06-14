@@ -13,6 +13,7 @@
         win_ec2_security_group: '{{win_ec2_test_name}}'
         win_ec2_public_key_path: '{{playbook_dir}}/test_id_rsa.pub'
         win_ec2_private_key_path: '{{playbook_dir}}/test_id_rsa'
+      tags: always
     - name: remove generated windows inventory file
       file:
         path: '{{win_ec2_inventory_dest}}'
@@ -22,6 +23,7 @@
         ssh-keygen -t rsa -N "" -f {{win_ec2_private_key_path|quote}}
       args:
         creates: '{{win_ec2_private_key_path}}'
+      tags: always
 
 - name: create windows instances in ec2
   hosts: local
