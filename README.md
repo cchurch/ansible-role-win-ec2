@@ -19,7 +19,7 @@ The following variables may be defined to customize this role:
 - `win_ec2_security_group_id`: Specify an existing security group ID instead of creating one, default uses the result of creating the security group.
 - `win_ec2_vpc_id`: VPC ID to use when creating the security group, default is no VPC.
 - `win_ec2_vpc_subnet_id`: VPC subnet ID in which to launch the instance, default is no VPC subnet.
-- `win_ec2_win_ec2_assign_public_ip`: Assign a public IP when provisioning within a VPC, default is no public IP.
+- `win_ec2_assign_public_ip`: Assign a public IP when provisioning within a VPC, default is no public IP.
 - `win_ec2_termination_protection`: Enable or disable termination protection, default is disabled.
 - `win_ec2_key_name`: Name of keypair created/used for Windows instances, default is `win-ec2`.
 - `win_ec2_public_key_path`: Path to public key for creating keypair, default is `~/.ssh/id_rsa.pub`.
