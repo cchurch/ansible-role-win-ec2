@@ -106,6 +106,7 @@
     ansible_password: '{{item.win_password}}'
     ansible_winrm_server_cert_validation: ignore
     ansible_connection: 'winrm'
+    added_by: win-ec2
   with_items: '{{win_ec2_passwords.results}}'
   when: 'win_ec2_images and "create" in win_ec2_action and win_ec2_passwords is defined'
 
