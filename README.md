@@ -16,6 +16,7 @@ The following variables may be defined to customize this role:
 - `win_ec2_instance_type`: Instance type for creating instances, default is `m3.medium`.
 - `win_ec2_security_group`: Name of security group to create/use for Windows instances, default is `win-ec2`.
 - `win_ec2_security_group_description`: Description for security group, default is `Security group for Ansible WinRM`.
+- `win_ec2_security_group_rules`: When creating a security group, use these rules, default only opens TCP ports 5986 and 3389.
 - `win_ec2_security_group_id`: Specify an existing security group ID instead of creating one, default uses the result of creating the security group.
 - `win_ec2_vpc_id`: VPC ID to use when creating the security group, default is no VPC.
 - `win_ec2_vpc_subnet_id`: VPC subnet ID in which to launch the instance, default is no VPC subnet.
@@ -28,6 +29,8 @@ The following variables may be defined to customize this role:
 - `win_ec2_images`: List of AMIs to use for creating instances.  Each list item should be a hash
   containing `ami_id` and `name` keys.  Default is `{{win_ec2_default_images[win_ec2_region]}}`.
 - `win_ec2_action`: Action to perform, should be one of `create`, `recreate` or `destroy`; default is `create`.
+- `win_ec2_winrm_port`: Port for connecting to new instances, default is `5986`.
+- `win_ec2_winrm_user`: Username for connecting to new instances, default is `Administrator`.
 - `win_ec2_inventory_dest`: Path to write static inventory file, default is `{{playbook_dir}}/inventory.win-ec2`.
 - `win_ec2_wait_for`: Wait for network connectivity on instance public IP after created, default is `true`.
 - `win_ec2_wait_for_delay`: Number of seconds to wait before checking public IP, default is `5`.

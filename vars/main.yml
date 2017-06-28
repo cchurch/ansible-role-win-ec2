@@ -15,45 +15,13 @@ win_ec2_default_images:
     - name: server-2016
       ami_id: ami-c61163d0
 
-win_ec2_winrm_port: 5986
-win_ec2_winrm_user: Administrator
+win_ec2_default_winrm_port: 5986
+win_ec2_default_winrm_user: Administrator
 
-win_ec2_security_group_rules:
-  - proto: tcp
-    from_port: 22
-    to_port: 22
-    cidr_ip: 0.0.0.0/0
-  - proto: tcp
-    from_port: 80
-    to_port: 80
-    cidr_ip: 0.0.0.0/0
-  - proto: tcp
-    from_port: 88
-    to_port: 88
-    cidr_ip: 0.0.0.0/0
-  - proto: udp
-    from_port: 88
-    to_port: 88
-    cidr_ip: 0.0.0.0/0
-  - proto: tcp
-    from_port: 389
-    to_port: 389
-    cidr_ip: 0.0.0.0/0
-  - proto: tcp
-    from_port: 443
-    to_port: 443
-    cidr_ip: 0.0.0.0/0
-  - proto: tcp
-    from_port: 636
-    to_port: 636
-    cidr_ip: 0.0.0.0/0
+win_ec2_default_security_group_rules:
   - proto: tcp
     from_port: 3389
     to_port: 3389
-    cidr_ip: 0.0.0.0/0
-  - proto: tcp
-    from_port: 5985
-    to_port: 5985
     cidr_ip: 0.0.0.0/0
   - proto: tcp
     from_port: 5986
